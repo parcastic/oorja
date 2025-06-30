@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oorja: The Digital Shrine</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Swiper.js for Carousel -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    
+    <!-- Updated Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Marcellus+SC&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 1. Color Palette & Design System */
+        :root {
+            --cream-bg: #FFFBF5;
+            --saffron-gold: #FFB900;
+            --lotus-pink: #E6A4B4;
+            --temple-brown: #6D5B4F;
+            --line-gray: #D1D5DB;
+        }
+
+        /* 2. Typography */
+        body {
+            background-color: var(--cream-bg);
+            color: var(--temple-brown);
+            font-family: 'Lora', serif;
+            cursor: none;
+        }
+        
+        .font-headline { font-family: 'Cormorant Garamond', serif; }
+        .font-subhead { font-family: 'Marcellus SC', serif; }
+        .font-ui { font-family: 'Nunito', sans-serif; }
+
+        /* Hinglish-First Typography Hierarchy */
+        .path-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--temple-brown);
+            line-height: 1.2;
+        }
+        .path-card .english-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--temple-brown);
+            opacity: 0.7;
+        }
+        .path-card .description {
+            font-size: 1rem;
+            color: var(--temple-brown);
+            margin-top: 0.75rem;
+        }
+
+        /* 3. Custom Cursor */
+        .custom-cursor { position: fixed; left: 0; top: 0; pointer-events: none; border-radius: 50%; z-index: 9999; transition: transform 0.2s ease-out, width 0.3s ease, height 0.3s ease; }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--saffron-gold); }
+        .cursor-outline { width: 40px; height: 40px; border: 1px solid var(--lotus-pink); transform: translate(-16px, -16px); }
+        .cursor-grow { transform: scale(2.5) translate(-7px, -7px); border: 1px solid var(--saffron-gold); }
+
+        /* 4. Navigation Menu */
+        #burger-btn { z-index: 1001; }
+        .burger-line { transition: all 0.3s ease-in-out; }
+        #burger-btn.open .burger-line-1 { transform: rotate(45deg) translate(5px, 5px); }
+        #burger-btn.open .burger-line-2 { opacity: 0; }
+        #burger-btn.open .burger-line-3 { transform: rotate(-45deg) translate(5px, -5px); }
+        
+        #mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        #mobile-menu.open { transform: translateX(0); }
+
+        /* 5. Hero Video Background */
+        #hero-video {
+            position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%; width: auto; height: auto; z-index: 0;
+            transform: translateX(-50%) translateY(-50%); object-fit: cover;
+        }
+
+        /* 6. Parallax Zoom Section */
+        .parallax-zoom-section { height: 150vh; position: relative; }
+        .parallax-zoom-sticky-container { position: sticky; top: 0; height: 100vh; width: 100%; overflow: hidden; }
+        .parallax-zoom-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1506126613408-4e05860f5d5e?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            transform-origin: center center; will-change: transform;
+        }
+
+        /* 7. Testimonial Carousel (Swiper) */
+        .testimonial-swiper { width: 100%; height: 500px; }
+        .swiper-slide {
+            width: 380px !important;
+            height: 420px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s ease;
+        }
+        .swiper-slide:hover { transform: scale(1.05); }
+        .blob-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .testimonial-content {
+            position: relative; z-index: 10;
+            text-align: center; color: white;
+            padding: 2rem; background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            border-radius: 1rem;
+            width: 80%;
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+    <div class="custom-cursor cursor-outline"></div>
+    <div class="custom-cursor cursor-dot"></div>
+
+    <!-- Burger Menu Button -->
+    <button id="burger-btn" class="fixed top-6 left-6 w-8 h-8 space-y-1.5 flex flex-col justify-center items-center interactive-element">
+        <span class="block w-full h-0.5 bg-[var(--temple-brown)] burger-line burger-line-1"></span>
+        <span class="block w-full h-0.5 bg-[var(--temple-brown)] burger-line burger-line-2"></span>
+        <span class="block w-full h-0.5 bg-[var(--temple-brown)] burger-line burger-line-3"></span>
+    </button>
+
+    <!-- Navigation Menu Panel -->
+    <nav id="mobile-menu" class="fixed top-0 left-0 w-full md:w-1/3 h-full bg-[var(--cream-bg)]/95 backdrop-blur-lg z-1000 flex flex-col justify-center items-center space-y-8">
+        <a href="#about" class="font-headline text-4xl text-[var(--temple-brown)] hover:text-[var(--saffron-gold)] transition-colors menu-link">About</a>
+        <a href="#paths" class="font-headline text-4xl text-[var(--temple-brown)] hover:text-[var(--saffron-gold)] transition-colors menu-link">Paths</a>
+        <a href="#testimonials" class="font-headline text-4xl text-[var(--temple-brown)] hover:text-[var(--saffron-gold)] transition-colors menu-link">Voices</a>
+        <a href="#intention-cta" class="font-headline text-4xl text-[var(--temple-brown)] hover:text-[var(--saffron-gold)] transition-colors menu-link">Intention</a>
+    </nav>
+
+    <header class="fixed top-0 left-0 w-full z-50">
+        <div class="container mx-auto px-6 py-4 flex flex-col justify-center items-center">
+            <h1 class="font-headline text-4xl font-bold text-[var(--temple-brown)]">Oorja</h1>
+            <p class="font-ui text-sm text-[var(--temple-brown)]/80">The Digital Shrine</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- 1. The Temple Entrance (Hero Section) -->
+        <section id="hero" class="h-screen min-h-[700px] flex flex-col justify-center items-center relative text-center text-white px-4 overflow-hidden">
+            <video id="hero-video" src="https://cdn.shopify.com/videos/c/o/v/36a6932daff84c9681d7380504468a84.mp4" loop muted playsinline autoplay preload="metadata" poster="https://cdn.shopify.com/s/files/1/0748/3382/1949/files/hero-video-poster.jpg?v=1751086889"></video>
+            <div class="absolute inset-0 bg-gradient-to-t from-[var(--temple-brown)] via-[var(--temple-brown)]/60 to-transparent z-10"></div>
+            <div class="relative z-20 flex flex-col items-center">
+                <div class="w-24 h-24 mb-8 rounded-full diya-glow bg-[var(--saffron-gold)]/30 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-[var(--saffron-gold)]" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 7.072l.707-.707a1 1 0 10-1.414-1.414l-.707.707a1 1 0 001.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>
+                </div>
+                <h1 class="font-headline text-5xl md:text-7xl lg:text-8xl mb-4 reveal">Welcome to Oorja</h1>
+                <p class="text-xl md:text-2xl mb-2 reveal" style="transition-delay: 200ms;">Pause. Take a breath.</p>
+                <p class="text-lg md:text-xl reveal" style="transition-delay: 400ms;">Remove your digital shoes and enter mindfully.</p>
+            </div>
+        </section>
+
+        <!-- 2. The Sacred Courtyard (What is Oorja?) -->
+        <section id="about" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center max-w-4xl">
+                <h2 class="font-subhead text-4xl md:text-5xl text-[var(--temple-brown)] mb-6 reveal">The Heart of Our Digital Ashram</h2>
+                <p class="text-lg md:text-xl text-[var(--temple-brown)]/80 mb-6 leading-relaxed reveal">
+                    Oorja is not just a wellness platform, it's a digital sanctuary where ancient wisdom meets modern healing. Here, your journey toward wholeness unfolds through six sacred paths, each designed to nurture your body, mind, and spirit.
+                </p>
+                <blockquote class="text-lg md:text-xl text-[var(--temple-brown)] font-medium italic reveal border-l-4 border-[var(--saffron-gold)] pl-6">
+                    "Like a temple that welcomes all seekers, Oorja offers a space where you can breathe, heal, and bloom at your own pace."
+                </blockquote>
+            </div>
+        </section>
+
+        <!-- 3. The Six Sacred Paths of Oorja -->
+        <section id="paths" class="py-20 md:py-24 bg-[var(--cream-bg)]/50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="font-subhead text-4xl md:text-5xl text-[var(--temple-brown)] mb-4 reveal">The Six Sacred Paths of Oorja</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl mx-auto reveal">
+                    <!-- Path Cards -->
+                    <div class="path-card text-center p-4"><h3 class="mb-2">Yoga</h3><p class="description italic">"Where breath meets body"<br>Gentle flows for every soul</p></div>
+                    <div class="path-card text-center p-4"><h3 class="mb-2">Pitara</h3><p class="description italic">"Spiritual objects for modern souls"<br>Handcrafted incense, journals, healing kits</p></div>
+                    <div class="path-card text-center p-4"><h3 class="mb-2">Dhyan</h3><p class="description italic">"To see clearly, to sit gently"<br>Meditation circles, mindful mandalas</p></div>
+                    <div class="path-card text-center p-4"><h3 class="mb-2">Yatra</h3><p class="description italic">"Journey inward, travel outward"<br>Spiritual retreats, wellness escapes</p></div>
+                    <div class="path-card text-center p-4"><h3 class="mb-2">Ahaar</h3><p class="description italic">"Food as medicine, meals as meditation"<br>Seasonal nutrition, local ingredients</p></div>
+                    <div class="path-card text-center p-4"><h3 class="mb-2">Sangeet</h3><p class="description italic">"Sacred chants, healing soundscapes"<br>Community satsangs, personal rituals</p></div>
+                    <div class="path-card text-center p-4"><h3 class="mb-2">Jagrukta</h3><p class="description italic">"Mandala art, nature walks"<br>Journaling prompts, guided reflection</p></div>
+                    <div class="path-card text-center p-4"><h3 class="mb-2">Margdarshan</h3><p class="description italic">"Healers who understand your journey"<br>Psychologists, life coaches, astrologers</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Book Unfurling Image -->
+        <section id="resources" class="py-20 md:py-32 overflow-hidden">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2 text-center md:text-left reveal">
+                    <img src="https://images.unsplash.com/photo-1615800098779-1343e3113562?q=80&w=600&auto=format&fit=crop" alt="Ancient scroll unfurling" class="rounded-lg shadow-xl mx-auto"
+                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/EADFD5/6D5B4F?text=Ancient+Scrolls';">
+                </div>
+                <div class="md:w-1/2 reveal text-center md:text-left" style="transition-delay: 200ms;">
+                    <h2 class="font-headline text-4xl md:text-5xl text-[var(--temple-brown)] mb-4">A Growing Archive for Modern Seekers</h2>
+                    <p class="text-xl text-[var(--temple-brown)]/80 leading-relaxed">
+                        “Tips, stories, and tools - to carry light even in darkness.”
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Carousel -->
+        <section id="testimonials" class="py-20 md:py-24 bg-gradient-to-br from-[var(--lotus-pink)]/10 to-[var(--saffron-gold)]/10 overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="font-subhead text-4xl md:text-5xl text-[var(--temple-brown)] mb-4 reveal">Voices from Fellow Seekers</h2>
+                </div>
+                <div class="swiper testimonial-swiper reveal">
+                    <div class="swiper-wrapper">
+                        <!-- Slide 1 -->
+                        <div class="swiper-slide">
+                            <svg class="blob-image" viewBox="0 0 405 398" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clipBlob1"><path d="M400.663 225.831C387.773 294.701 336.423 378.491 250.653 394.801C120.523 419.551 34.5428 265.491 30.8128 258.581C16.5728 232.161 -13.1272 177.091 6.51278 122.231C32.4028 49.9114 126.263 27.5614 184.273 13.7514C237.143 1.16143 275.673 -8.00857 315.313 10.4214C387.353 43.9114 415.513 146.461 400.653 225.831H400.663Z"/></clipPath></defs><image width="100%" height="100%" href="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=800" clip-path="url(#clipBlob1)" preserveAspectRatio="xMidYMid slice"></image></svg>
+                            <div class="testimonial-content">
+                                <p class="italic mb-4">"Oorja taught me that healing isn't about perfection, it's about showing up with compassion."</p>
+                                <span class="font-ui font-bold">- Priya, Mumbai</span>
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="swiper-slide">
+                            <svg class="blob-image" viewBox="0 0 411 395" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clipBlob2"><path d="M410.5 172.283C410.5 285.666 321.774 424.689 205.5 377.571C100.548 335.043 0.5 285.657 0.5 172.283C0.5 58.9082 74.872 57.7743 183.586 11.4151C287.761 -33.0148 410.5 58.899 410.5 172.283Z"/></clipPath></defs><image width="100%" height="100%" href="https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=800" clip-path="url(#clipBlob2)" preserveAspectRatio="xMidYMid slice"></image></svg>
+                            <div class="testimonial-content">
+                                <p class="italic mb-4">"The travel experiences aren't just trips; they're pilgrimages that changed how I see the world."</p>
+                                <span class="font-ui font-bold">- Rohan, Delhi</span>
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide">
+                            <svg class="blob-image" viewBox="0 0 369 404" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clipBlob3"><path d="M364.764 203.042C343.782 311.957 287.578 403.735 192.37 403.735C97.1615 403.735 68.7413 302.886 19.9755 203.042C-54.94 49.6458 98.257 -11.7473 192.378 2.35766C293.081 17.4503 386.929 88.0013 364.772 203.051L364.764 203.042Z"/></clipPath></defs><image width="100%" height="100%" href="https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=800" clip-path="url(#clipBlob3)" preserveAspectRatio="xMidYMid slice"></image></svg>
+                            <div class="testimonial-content">
+                                <p class="italic mb-4">"Finally, a space that honors both my Indian roots and my modern life. It feels like coming home."</p>
+                                <span class="font-ui font-bold">- Ananya, Bangalore</span>
+                            </div>
+                        </div>
+                         <!-- Slide 4 (Duplicate for infinite loop) -->
+                        <div class="swiper-slide">
+                            <svg class="blob-image" viewBox="0 0 382 378" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clipBlob4"><path d="M3.82131 162.956C15.9816 97.6187 64.4248 18.1262 145.339 2.65276C268.103 -20.8278 349.216 125.331 352.735 131.886C366.169 156.951 394.187 209.197 375.659 261.243C351.235 329.854 262.688 351.057 207.962 364.159C158.085 376.103 121.736 384.803 84.3398 367.318C16.3779 335.546 -10.1881 238.256 3.83074 162.956H3.82131Z"/></clipPath></defs><image width="100%" height="100%" href="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=800" clip-path="url(#clipBlob4)" preserveAspectRatio="xMidYMid slice"></image></svg>
+                            <div class="testimonial-content">
+                                <p class="italic mb-4">"The guided meditations have become an essential part of my daily routine. Truly life-changing."</p>
+                                <span class="font-ui font-bold">- Vikram, Chennai</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Intention & CTA -->
+        <section id="intention-cta" class="py-20 md:py-24">
+            <div class="container mx-auto px-6 text-center max-w-2xl reveal">
+                <h3 class="font-subhead text-3xl text-[var(--temple-brown)] mb-6">Before entering this sacred space, what intention do you carry today?</h3>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                    <span class="text-lg text-[var(--temple-brown)] font-ui">I seek...</span>
+                    <input type="text" placeholder="peace, clarity, connection..." class="flex-grow w-full sm:w-auto bg-white/80 border border-[var(--line-gray)] rounded-full py-3 px-6 text-[var(--temple-brown)] placeholder-[var(--temple-brown)]/50 focus:ring-0 focus:outline-none focus:border-[var(--lotus-pink)] transition-all glowing-input interactive-element font-ui">
+                </div>
+                <button class="font-ui sunbeam-cta diya-flicker bg-gradient-to-br from-[var(--saffron-gold)] to-[var(--lotus-pink)] text-[var(--temple-brown)] font-bold text-lg py-4 px-10 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 interactive-element">
+                    Enter the Digital Ashram
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[var(--temple-brown)] text-[var(--cream-bg)] pt-16 pb-8 font-ui">
+        <div class="container mx-auto px-6">
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="font-subhead text-2xl mb-4">Stay Connected to Your Path</h4>
+                    <p class="text-[var(--cream-bg)]/70 mb-4 text-sm">Receive full moon reflections, seasonal wisdom, and gentle reminders for your journey.</p>
+                    <form class="flex flex-col sm:flex-row gap-2">
+                        <input type="email" placeholder="Your email" class="w-full bg-white/10 border border-white/20 rounded-md py-2 px-4 text-white placeholder-white/50 focus:ring-2 focus:ring-[var(--saffron-gold)] focus:outline-none interactive-element font-ui">
+                        <button type="submit" class="bg-[var(--saffron-gold)] text-[var(--temple-brown)] font-semibold py-2 px-4 rounded-md hover:bg-[var(--lotus-pink)] transition-colors interactive-element">Join</button>
+                    </form>
+                </div>
+                <!-- Community -->
+                <div class="md:text-center">
+                     <h4 class="font-subhead text-2xl mb-4">Community Connections</h4>
+                     <ul class="space-y-2 text-[var(--cream-bg)]/80 text-sm">
+                        <li><a href="#" class="hover:text-[var(--saffron-gold)] transition-colors interactive-element">WhatsApp Satsang groups</a></li>
+                        <li><a href="#" class="hover:text-[var(--saffron-gold)] transition-colors interactive-element">Monthly virtual gatherings</a></li>
+                        <li><a href="#" class="hover:text-[var(--saffron-gold)] transition-colors interactive-element">Seasonal celebration invites</a></li>
+                     </ul>
+                </div>
+                <!-- Social -->
+                <div class="md:text-center">
+                    <h4 class="font-subhead text-2xl mb-4">Follow Our Journey</h4>
+                    <div class="flex justify-center space-x-6">
+                        <a href="#" class="text-[var(--cream-bg)]/80 hover:text-[var(--saffron-gold)] transition-colors interactive-element" aria-label="Instagram"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z" /></svg></a>
+                        <a href="#" class="text-[var(--cream-bg)]/80 hover:text-[var(--saffron-gold)] transition-colors interactive-element" aria-label="YouTube"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10,15L15.19,12L10,9V15M21.56,7.17C21.69,7.64 21.78,8.27 21.84,9.07C21.91,9.87 21.94,10.56 21.94,11.16L22,12C22,14.19 21.84,15.8 21.56,16.83C21.31,17.73 20.73,18.31 19.83,18.56C19.36,18.69 18.73,18.78 17.93,18.84C17.13,18.91 16.44,18.94 15.84,18.94L15,19C12.81,19 11.2,18.84 10.17,18.56C9.27,18.31 8.69,17.73 8.44,16.83C8.31,16.36 8.22,15.73 8.16,14.93C8.09,14.13 8.06,13.44 8.06,12.84L8,12C8,9.81 8.16,8.2 8.44,7.17C8.69,6.27 9.27,5.69 10.17,5.44C11.2,5.16 12.81,5 15,5L15.84,5.06C16.44,5.06 17.13,5.09 17.93,5.16C18.73,5.22 19.36,5.31 19.83,5.44C20.73,5.69 21.31,6.27 21.56,7.17Z" /></svg></a>
+                        <a href="#" class="text-[var(--cream-bg)]/80 hover:text-[var(--saffron-gold)] transition-colors interactive-element" aria-label="Spotify"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 11.97s2.5-1.47 5-1.47 5 1.47 5 1.47M9 16s2-1 4-1 4 1 4 1"></path></svg></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-white/10 pt-6 text-center text-[var(--cream-bg)]/50 text-xs">
+                <p>&copy; 2024 Oorja. A mindful creation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Burger Menu ---
+            const burgerBtn = document.getElementById('burger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuLinks = mobileMenu.querySelectorAll('.menu-link');
+
+            function toggleMenu() {
+                burgerBtn.classList.toggle('open');
+                mobileMenu.classList.toggle('open');
+            }
+            burgerBtn.addEventListener('click', toggleMenu);
+            menuLinks.forEach(link => {
+                link.addEventListener('click', toggleMenu);
+            });
+
+            // --- Custom Cursor ---
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorOutline = document.querySelector('.cursor-outline');
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX; const posY = e.clientY;
+                cursorDot.style.left = `${posX}px`; cursorDot.style.top = `${posY}px`;
+                cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" });
+            });
+            document.querySelectorAll('.interactive-element, a, button').forEach(el => {
+                el.addEventListener('mouseenter', () => cursorOutline.classList.add('cursor-grow'));
+                el.addEventListener('mouseleave', () => cursorOutline.classList.remove('cursor-grow'));
+            });
+
+            // --- Scroll-triggered Animations ---
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('reveal-visible');
+                });
+            }, { threshold: 0.2 });
+            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+            // --- Header style on scroll ---
+            const header = document.querySelector('header');
+            const burger = document.getElementById('burger-btn');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('bg-[var(--cream-bg)]/80', 'backdrop-blur-sm', 'shadow-sm');
+                    burger.classList.add('text-black');
+                } else {
+                    header.classList.remove('bg-[var(--cream-bg)]/80', 'backdrop-blur-sm', 'shadow-sm');
+                    burger.classList.remove('text-black');
+                }
+            });
+            
+            // --- Parallax Zoom Effect ---
+            const parallaxZoomSection = document.getElementById('parallax-zoom-section');
+            const parallaxZoomImg = document.getElementById('parallax-zoom-img');
+            function handleParallaxZoom() {
+                if (!parallaxZoomSection) return;
+                const rect = parallaxZoomSection.getBoundingClientRect();
+                if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
+                    const scrollableHeight = parallaxZoomSection.offsetHeight - window.innerHeight;
+                    const scrollProgress = Math.max(0, Math.min(1, -rect.top / scrollableHeight));
+                    const scale = 1 + scrollProgress * 0.4;
+                    parallaxZoomImg.style.transform = `scale(${scale})`;
+                }
+            }
+            window.addEventListener('scroll', () => {
+                window.requestAnimationFrame(handleParallaxZoom);
+            });
+
+            // --- Testimonial Swiper Carousel ---
+            const swiper = new Swiper('.testimonial-swiper', {
+                effect: 'coverflow',
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: 'auto',
+                loop: true,
+                autoplay: {
+                    delay: 4000,
+                    disableOnInteraction: false,
+                },
+                coverflowEffect: {
+                    rotate: 0,
+                    stretch: 80,
+                    depth: 200,
+                    modifier: 1,
+                    slideShadows: false,
+                },
+                spaceBetween: 60,
+            });
+        });
+    </script>
+</body>
+</html>
